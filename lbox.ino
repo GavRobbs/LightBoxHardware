@@ -38,13 +38,20 @@ bool newpattern = true;
 
 void RequestData(){
   newdata = true;
-  if(client.connect(server,80)) {
-    // Make a HTTP request:
-    client.println("GET /todo HTTP/1.1");
-    client.println("Host: fathomless-sands-81815.herokuapp.com");
-    client.println("Connection: close");
-    client.println();
+  client.stop();
+  int clistatus = 0;
+  delay(3000);
+  while(clistatus != 1){
+    clistatus = client.connect(server, 80);
+    digitalWrite(WHITE_LED, HIGH);
+    delay(3000);
+    digitalWrite(WHITE_LED, LOW);
   }
+  digitalWrite(5, LOW);
+  client.println("GET /todo HTTP/1.1");
+  client.println("Host: fathomless-sands-81815.herokuapp.com");
+  client.println("Connection: close");
+  client.println();
 };
 
 void setup() {
@@ -55,8 +62,7 @@ void setup() {
   pinMode(6, OUTPUT);
   pinMode(7, OUTPUT);
   WiFi.setPins(PIN_CS, PIN_IRQ, PIN_RST, -1);
-  Serial.begin(9600);
-  
+
   while(status != WL_CONNECTED){
     status = WiFi.begin(ssid, pass);
     delay(5000);
@@ -64,9 +70,7 @@ void setup() {
 
   memset(pattern, "\0", sizeof(char)*32);
 
-  Serial.println("Setup complete");
-
-   RequestData();
+  RequestData();
 }
 
 void AnalyzeData(){
@@ -93,7 +97,6 @@ void AnalyzeData(){
     }
   } else if(data_buff.indexOf("context:change") != -1){
     temp = data_buff.substring(data_buff.indexOf("context:change"));
-    Serial.println(temp);   
   } else{
     //I dunno.
   }
